@@ -34,4 +34,13 @@ module examples::color_object {
         into_object.green = from_object.green;
         into_object.blue = from_object.blue;
     }
+
+    public entry fun delete(object: ColorObject) {
+        let ColorObject { id, red: _, green: _, blue: _ } = object;
+        object::delete(id);
+    }
+
+    public entry fun transfer(object: ColorObject, recipient: address) {
+        transfer::transfer(object, recipient)
+    }
 }

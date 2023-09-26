@@ -72,4 +72,58 @@ module examples::object_tests {
         };
         test_scenario::end(scenario_val);
     }
+
+    #[test]
+    fun test_delete() {
+        let owner = @0x1;
+        // Create a ColorObject and transfer it to @owner.
+        let scenario_val = test_scenario::begin(owner);
+        let scenario = &mut scenario_val;
+        {
+            let ctx = test_scenario::ctx(scenario);
+            color_object::create(255, 0, 255, ctx);
+        };
+        // Delete the ColorObject just created.
+        test_scenario::next_tx(scenario, owner);
+        {
+            let obj = test_scenario::take_from_sender<ColorObject>(scenario);
+            color_object::delete(obj);
+        };
+        // Verify that the object was indeed deleted.
+        test_scenario::next_tx(scenario, owner);
+        {
+            assert!(!test_scenario::has_most_recent_for_sender<ColorObject>(scenario), 0);
+        };
+        test_scenario::end(scenario_val);
+    }
+
+    #[test]
+    fun test_transfer() {
+        let owner = @0x1;
+        // Create a ColorObject and transfer it to @owner.
+        let scenario_val = test_scenario::begin(owner);
+        let scenario = &mut scenario_val;
+        {
+            let ctx = test_scenario::ctx(scenario);
+            color_object::create(255, 0, 255, ctx);
+        };
+        // Transfer the ColorObject to @new_owner.
+        let recipient = @0x2;
+        test_scenario::next_tx(scenario, owner);
+        {
+            let obj = test_scenario::take_from_sender<ColorObject>(scenario);
+            color_object::transfer(obj, recipient);
+        };
+        // Check that owner no longer owns the object.
+        test_scenario::next_tx(scenario, owner);
+        {
+            assert!(!test_scenario::has_most_recent_for_sender<ColorObject>(scenario), 0);
+        };
+        // Check that recipient now owns the object.
+        test_scenario::next_tx(scenario, recipient);
+        {
+            assert!(test_scenario::has_most_recent_for_sender<ColorObject>(scenario), 0);
+        };
+        test_scenario::end(scenario_val);
+    }
 }
