@@ -43,4 +43,19 @@ module examples::color_object {
     public entry fun transfer(object: ColorObject, recipient: address) {
         transfer::transfer(object, recipient)
     }
+
+    public entry fun freeze_object(object: ColorObject) {
+        transfer::freeze_object(object)
+    }
+
+    public entry fun create_immutable(red: u8, green: u8, blue: u8, ctx: &mut TxContext) {
+        let color_object = new(red, green, blue, ctx);
+        transfer::freeze_object(color_object)
+    }
+
+    public entry fun update(object: &mut ColorObject, red: u8, green: u8, blue: u8) {
+        object.red = red;
+        object.green = green;
+        object.blue = blue;
+    }
 }
